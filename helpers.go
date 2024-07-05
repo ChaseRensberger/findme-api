@@ -20,6 +20,7 @@ func insertPlayerLocation(latitude float64, longitude float64) error {
 	}
 
 	apiUrl := os.Getenv("POCKETBASE_URL")
+  // why able to pass in something not of io.Reader if we don't specify type
 	req, err := http.NewRequest(http.MethodPost, apiUrl+"/api/collections/player_locations/records", bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return err
@@ -41,14 +42,28 @@ func insertPlayerLocation(latitude float64, longitude float64) error {
 	return nil
 }
 
-func getCurrentCircleByGameId(id string, token string) (Circle, error) {
+// TODO
+func getAllPlayerLocations(auth_token) {
+
+	apiUrl := os.Getenv("POCKETBASE_URL")
+	req, err := http.NewRequest(http.MethodGet, apiUrl+"/api/collections/player_locations/records", nil)
+	if err != nil {
+		return err
+	}
+  authorizeRequest(req, auth_token)
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+  //...
+
+}
+
+func getCurrentCircleByGameId(id string, auth_token string) (Circle, error) {
 	apiUrl := os.Getenv("POCKETBASE_URL")
 	req, err := http.NewRequest(http.MethodGet, apiUrl+"/api/collections/games/records/"+id+"?expand=current_circle", nil)
 	if err != nil {
 		return Circle{}, err
 	}
-
-	req.Header.Set("Authorization", "Bearer "+token)
+  authorizeRequest(req, auth_token)
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
@@ -68,4 +83,9 @@ func getCurrentCircleByGameId(id string, token string) (Circle, error) {
 	circle := response.Expand.CurrentCircle
 	return circle, nil
 
+}
+
+// TODO: Verify works
+func authorizeRequest(req, auth_token) {
+	req.Header.Set("Authorization", "Bearer " + auth_token)
 }

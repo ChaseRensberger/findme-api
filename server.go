@@ -61,5 +61,10 @@ func main() {
 		return c.JSON(http.StatusOK, circle)
 	})
 
+  e.GET("/test", func(c echo.Context) error {
+    ip := c.RealIP()
+    return c.String(http.StatusOK, "Client IP: " + ip)
+  })
+
 	e.Logger.Fatal(e.Start(":1323"))
 }

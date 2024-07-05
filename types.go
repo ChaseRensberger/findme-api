@@ -12,6 +12,7 @@ type Circle struct {
 	Updated        string `json:"updated"`
 }
 
+// TODO: rename
 type responseStruct struct {
 	Expand struct {
 		CurrentCircle Circle `json:"current_circle"`
