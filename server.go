@@ -50,7 +50,7 @@ func main() {
 		return c.String(http.StatusOK, "Player location inserted successfully")
 	})
 
-	e.GET("/get_current_circle", func(c echo.Context) error {
+	e.GET("/current_circle", func(c echo.Context) error {
 		id := c.QueryParam("id")
 		token := c.QueryParam("token")
 
@@ -61,10 +61,19 @@ func main() {
 		return c.JSON(http.StatusOK, circle)
 	})
 
-  e.GET("/test", func(c echo.Context) error {
-    ip := c.RealIP()
-    return c.String(http.StatusOK, "Client IP: " + ip)
-  })
+	e.GET("all_player_locations", func(c echo.Context) error {
+		token := c.QueryParam("token")
+		playerLocations, err := getAllPlayerLocations(token)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, playerLocations)
+	})
+
+	e.GET("/test", func(c echo.Context) error {
+		ip := c.RealIP()
+		return c.String(http.StatusOK, "Client IP: "+ip)
+	})
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

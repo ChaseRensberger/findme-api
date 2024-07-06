@@ -42,34 +42,44 @@ func insertPlayerLocation(latitude float64, longitude float64) error {
 	return nil
 }
 
-// TODO
 func getAllPlayerLocations(auth_token string) ([]PlayerLocation, error) {
-
 	apiUrl := os.Getenv("POCKETBASE_URL")
-	req, err := http.NewRequest(http.MethodGet, apiUrl+"/api/collections/player_locations/records", nil)
-	if err != nil {
-		return nil, err
-	}
-	authorizeRequest(req, auth_token)
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
+	allLocations := []PlayerLocation{}
 
 	page := 1
+	for {
+		reqUrl := fmt.Sprintf("%s/api/collections/player_locations/records?page=%d", apiUrl, page)
+		req, err := http.NewRequest(http.MethodGet, reqUrl, nil)
+		if err != nil {
+			return nil, err
+		}
+		authorizeRequest(req, auth_token)
 
-	var response PlayerLocationsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		client := http.DefaultClient
+		resp, err := client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		}
+
+		var response PlayerLocationsResponse
+		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+			return nil, err
+		}
+
+		allLocations = append(allLocations, response.Items...)
+
+		if page >= response.TotalPages {
+			break
+		}
+		page++
 	}
-	return response.Items, nil
 
+	return allLocations, nil
 }
 
 func getCurrentCircleByGameId(id string, auth_token string) (Circle, error) {
@@ -100,7 +110,6 @@ func getCurrentCircleByGameId(id string, auth_token string) (Circle, error) {
 
 }
 
-// TODO: Verify works
 func authorizeRequest(req *http.Request, auth_token string) {
 	req.Header.Set("Authorization", "Bearer "+auth_token)
 }
