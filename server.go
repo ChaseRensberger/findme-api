@@ -24,7 +24,8 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	e.POST("/insert_player", func(c echo.Context) error {
+	// NO AUTH, RATE LIMITED
+	e.POST("/player_locations", func(c echo.Context) error {
 		var reqBody struct {
 			Latitude  string `json:"latitude"`
 			Longitude string `json:"longitude"`
@@ -51,7 +52,8 @@ func main() {
 		return c.String(http.StatusOK, "Player location inserted successfully")
 	})
 
-	e.GET("all_player_locations", func(c echo.Context) error {
+	// AUTH
+	e.GET("player_locations", func(c echo.Context) error {
 		token := c.QueryParam("token")
 		playerLocations, err := getAllPlayerLocations(token)
 		if err != nil {
@@ -60,6 +62,7 @@ func main() {
 		return c.JSON(http.StatusOK, playerLocations)
 	})
 
+	// NO AUTH
 	e.GET("/current_circle", func(c echo.Context) error {
 		circle, err := getCurrentCircle()
 		if err != nil {
@@ -68,6 +71,7 @@ func main() {
 		return c.JSON(http.StatusOK, circle)
 	})
 
+	// AUTH
 	e.PUT("/set_start_conditions", func(c echo.Context) error {
 		auth_token := c.Request().Header.Get("Authorization")
 		startTimeStr := c.QueryParam("startTime")
@@ -94,4 +98,12 @@ func main() {
 	// })
 
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+func getAuthToken(c echo.Context) (string, error) {
+	auth_token := c.Request().Header.Get("Authorization")
+	if auth_token == "" {
+		return "", fmt.Errorf("missing Authorization header")
+	}
+	return auth_token, nil
 }
