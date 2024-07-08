@@ -91,7 +91,7 @@ func updateCircle(circle Circle, auth_token string) error {
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPut, apiUrl+"/api/collections/circles/records/"+circle.ID, bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPatch, apiUrl+"/api/collections/circles/records/"+circle.ID, bytes.NewBuffer(payload))
 	if err != nil {
 		return err
 	}
@@ -139,23 +139,29 @@ func populateCircles(startTime time.Time, interval time.Duration, auth_token str
 
 	// now sort the circles by width
 	sort.Slice(response.Items, func(i, j int) bool {
-		return response.Items[i].Meters < response.Items[j].Meters
+		return response.Items[i].Meters > response.Items[j].Meters
 	})
 
 	// update first circle
 	response.Items[0].Start = startTime.Format(standardTimeFormat)
 	response.Items[0].End = startTime.Add(interval).Format(standardTimeFormat)
+	fmt.Println("-----------------")
+	fmt.Printf("Start: %s\n", response.Items[0].Start)
+	fmt.Printf("End: %s\n", response.Items[0].End)
+	fmt.Printf("Width: %d\n", response.Items[0].Meters)
+	fmt.Println("-----------------")
 	updateCircle(response.Items[0], auth_token)
 
 	// now update every circle based on the previous circle
-	for circleIdx, circle := range response.Items[1:] {
-		circle.Start = response.Items[circleIdx-1].End
-		end, err := time.Parse("2006-01-02 15:04:05.000Z", response.Items[circleIdx-1].End)
+	for circleIdx := 1; circleIdx < len(response.Items); circleIdx++ {
+		currentCircle := response.Items[circleIdx]
+		currentCircle.Start = response.Items[circleIdx-1].End
+		end, err := time.Parse(standardTimeFormat, response.Items[circleIdx-1].End)
 		if err != nil {
 			return err
 		}
-		circle.End = end.Add(interval).Format("2006-01-02 15:04:05.000Z")
-		updateCircle(circle, auth_token)
+		currentCircle.End = end.Add(interval).Format(standardTimeFormat)
+		updateCircle(currentCircle, auth_token)
 	}
 
 	return nil
