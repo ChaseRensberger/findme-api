@@ -1,5 +1,7 @@
 package main
 
+var standardTimeFormat = "2006-01-02 15:04:05.000Z"
+
 type Circle struct {
 	Latitude       string `json:"Latitude"`
 	Longitude      string `json:"Longitude"`
@@ -10,13 +12,8 @@ type Circle struct {
 	Field          string `json:"field"`
 	ID             string `json:"id"`
 	Updated        string `json:"updated"`
-}
-
-// TODO: rename
-type responseStruct struct {
-	Expand struct {
-		CurrentCircle Circle `json:"current_circle"`
-	} `json:"expand"`
+	Start          string `json:"start"`
+	End            string `json:"end"`
 }
 
 type PlayerLocation struct {
@@ -35,4 +32,12 @@ type PlayerLocationsResponse struct {
 	TotalItems int              `json:"totalItems"`
 	TotalPages int              `json:"totalPages"`
 	Items      []PlayerLocation `json:"items"`
+}
+
+type CirclesResponse struct {
+	Page       int      `json:"page"`
+	PerPage    int      `json:"perPage"`
+	TotalPages int      `json:"totalPages"`
+	TotalItems int      `json:"totalItems"`
+	Items      []Circle `json:"items"`
 }

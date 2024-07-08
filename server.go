@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -50,17 +51,6 @@ func main() {
 		return c.String(http.StatusOK, "Player location inserted successfully")
 	})
 
-	e.GET("/current_circle", func(c echo.Context) error {
-		id := c.QueryParam("id")
-		token := c.QueryParam("token")
-
-		circle, err := getCurrentCircleByGameId(id, token)
-		if err != nil {
-			return err
-		}
-		return c.JSON(http.StatusOK, circle)
-	})
-
 	e.GET("all_player_locations", func(c echo.Context) error {
 		token := c.QueryParam("token")
 		playerLocations, err := getAllPlayerLocations(token)
@@ -70,10 +60,38 @@ func main() {
 		return c.JSON(http.StatusOK, playerLocations)
 	})
 
-	e.GET("/test", func(c echo.Context) error {
-		ip := c.RealIP()
-		return c.String(http.StatusOK, "Client IP: "+ip)
+	e.GET("/current_circle", func(c echo.Context) error {
+		circle, err := getCurrentCircle()
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, circle)
 	})
+
+	e.PUT("/set_start_conditions", func(c echo.Context) error {
+		auth_token := c.Request().Header.Get("Authorization")
+		startTimeStr := c.QueryParam("start_time")
+		intervalStr := c.QueryParam("interval")
+
+		startTime, err := time.Parse(standardTimeFormat, startTimeStr)
+		if err != nil {
+			return err
+		}
+		interval, err := time.ParseDuration(intervalStr)
+		if err != nil {
+			return err
+		}
+		err = populateCircles(startTime, interval, auth_token)
+		if err != nil {
+			return err
+		}
+		return c.String(http.StatusOK, "Start conditions set")
+	})
+
+	// e.GET("/test", func(c echo.Context) error {
+	// 	ip := c.RealIP()
+	// 	return c.String(http.StatusOK, "Client IP: "+ip)
+	// })
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
