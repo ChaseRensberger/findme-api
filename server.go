@@ -70,7 +70,7 @@ func main() {
 
 	e.PUT("/set_start_conditions", func(c echo.Context) error {
 		auth_token := c.Request().Header.Get("Authorization")
-		startTimeStr := c.QueryParam("start_time")
+		startTimeStr := c.QueryParam("startTime")
 		intervalStr := c.QueryParam("interval")
 
 		startTime, err := time.Parse(standardTimeFormat, startTimeStr)
