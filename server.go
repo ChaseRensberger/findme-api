@@ -73,7 +73,10 @@ func main() {
 
 	// AUTH
 	e.PUT("/set_start_conditions", func(c echo.Context) error {
-		auth_token := c.Request().Header.Get("Authorization")
+		auth_token, err := getAuthToken(c)
+		if err != nil {
+			return err
+		}
 		startTimeStr := c.QueryParam("startTime")
 		intervalStr := c.QueryParam("interval")
 

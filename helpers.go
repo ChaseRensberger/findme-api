@@ -145,11 +145,6 @@ func populateCircles(startTime time.Time, interval time.Duration, auth_token str
 	// update first circle
 	response.Items[0].Start = startTime.Format(standardTimeFormat)
 	response.Items[0].End = startTime.Add(interval).Format(standardTimeFormat)
-	fmt.Println("-----------------")
-	fmt.Printf("Start: %s\n", response.Items[0].Start)
-	fmt.Printf("End: %s\n", response.Items[0].End)
-	fmt.Printf("Width: %d\n", response.Items[0].Meters)
-	fmt.Println("-----------------")
 	updateCircle(response.Items[0], auth_token)
 
 	// now update every circle based on the previous circle
