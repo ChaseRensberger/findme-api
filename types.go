@@ -3,17 +3,18 @@ package main
 var standardTimeFormat = "2006-01-02 15:04:05.000Z"
 
 type Circle struct {
-	Latitude       string `json:"Latitude"`
-	Longitude      string `json:"Longitude"`
-	Meters         int    `json:"Meters"`
-	CollectionID   string `json:"collectionId"`
-	CollectionName string `json:"collectionName"`
-	Created        string `json:"created"`
-	Field          string `json:"field"`
-	ID             string `json:"id"`
-	Updated        string `json:"updated"`
-	Start          string `json:"start"`
-	End            string `json:"end"`
+	Latitude       string  `json:"Latitude"`
+	Longitude      string  `json:"Longitude"`
+	Meters         int     `json:"Meters"`
+	CollectionID   string  `json:"collectionId"`
+	CollectionName string  `json:"collectionName"`
+	Created        string  `json:"created"`
+	Field          string  `json:"field"`
+	ID             string  `json:"id"`
+	Updated        string  `json:"updated"`
+	Start          string  `json:"start"`
+	End            string  `json:"end"`
+	Zoom           float64 `json:"zoom"`
 }
 
 type PlayerLocation struct {
