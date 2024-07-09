@@ -175,7 +175,7 @@ func getCurrentCircle() (Circle, error) {
 		return Circle{}, err
 	}
 
-	currentTime := time.Now()
+	currentTime := time.Now().UTC()
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -195,12 +195,17 @@ func getCurrentCircle() (Circle, error) {
 			fmt.Println(err)
 			return Circle{}, err
 		}
-		fmt.Println(start)
 
 		end, err := time.Parse(standardTimeFormat, circle.End)
 		if err != nil {
 			return Circle{}, err
 		}
+
+		fmt.Println("--------------------")
+		fmt.Println("start: ", start)
+		fmt.Println("end: ", end)
+		fmt.Println("currentTime: ", currentTime)
+		fmt.Println("--------------------")
 
 		if currentTime.After(start) && currentTime.Before(end) {
 			return circle, nil
