@@ -3,9 +3,9 @@ package main
 var standardTimeFormat = "2006-01-02 15:04:05.000Z"
 
 type Circle struct {
-	Latitude       string  `json:"Latitude"`
-	Longitude      string  `json:"Longitude"`
-	Meters         int     `json:"Meters"`
+	Latitude       string  `json:"latitude"`
+	Longitude      string  `json:"longitude"`
+	Meters         int     `json:"meters_across"`
 	CollectionID   string  `json:"collectionId"`
 	CollectionName string  `json:"collectionName"`
 	Created        string  `json:"created"`
