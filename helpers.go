@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-var AUTH_TOKEN string = os.Getenv("AUTH_TOKEN")
-
 func insertPlayerLocation(latitude float64, longitude float64) error {
 	payload := map[string]float64{
 		"latitude":  latitude,
@@ -201,11 +199,12 @@ func setGameTime(id string, start string, end string, auth_token string) error {
 
 func getCurrentCircle() Circle {
 	apiUrl := os.Getenv("POCKETBASE_URL")
+	auth_token := os.Getenv("AUTH_TOKEN")
 	req, err := http.NewRequest(http.MethodGet, apiUrl+"/api/collections/circles/records", nil)
 	if err != nil {
 		return Circle{}
 	}
-	authorizeRequest(req, AUTH_TOKEN)
+	authorizeRequest(req, auth_token)
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
