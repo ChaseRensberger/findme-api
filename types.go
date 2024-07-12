@@ -2,6 +2,16 @@ package main
 
 var standardTimeFormat = "2006-01-02 15:04:05.000Z"
 
+type Game struct {
+	CollectionID   string `json:"collectionId"`
+	CollectionName string `json:"collectionName"`
+	Created        string `json:"created"`
+	ID             string `json:"id"`
+	Updated        string `json:"updated"`
+	Start          string `json:"start"`
+	End            string `json:"end"`
+}
+
 type Circle struct {
 	Latitude       string  `json:"latitude"`
 	Longitude      string  `json:"longitude"`
@@ -42,3 +52,11 @@ type CirclesResponse struct {
 	TotalItems int      `json:"totalItems"`
 	Items      []Circle `json:"items"`
 }
+
+type GameState string
+
+const (
+	WAITING  GameState = "WAITING"
+	ACTIVE   GameState = "ACTIVE"
+	FINISHED GameState = "FINISHED"
+)

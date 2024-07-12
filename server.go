@@ -78,7 +78,7 @@ func main() {
 	})
 
 	// AUTH
-	e.PUT("/set_start_conditions", func(c echo.Context) error {
+	e.PUT("/start_conditions", func(c echo.Context) error {
 		auth_token, err := getAuthToken(c)
 		if err != nil {
 			return err
@@ -99,6 +99,15 @@ func main() {
 			return err
 		}
 		return c.String(http.StatusOK, "Start conditions set")
+	})
+
+	e.GET("/game_state", func(c echo.Context) error {
+		id := c.QueryParam("id")
+		gameState, err := getGameState(id)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, gameState)
 	})
 
 	// e.GET("/test", func(c echo.Context) error {

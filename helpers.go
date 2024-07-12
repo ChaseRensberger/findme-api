@@ -149,14 +149,13 @@ func populateCircles(startTime time.Time, interval time.Duration, auth_token str
 
 	// now update every circle based on the previous circle
 	for circleIdx := 1; circleIdx < len(response.Items); circleIdx++ {
-		currentCircle := response.Items[circleIdx]
-		currentCircle.Start = response.Items[circleIdx-1].End
+		response.Items[circleIdx].Start = response.Items[circleIdx-1].End
 		end, err := time.Parse(standardTimeFormat, response.Items[circleIdx-1].End)
 		if err != nil {
 			return err
 		}
-		currentCircle.End = end.Add(interval).Format(standardTimeFormat)
-		updateCircle(currentCircle, auth_token)
+		response.Items[circleIdx].End = end.Add(interval).Format(standardTimeFormat)
+		updateCircle(response.Items[circleIdx], auth_token)
 	}
 
 	return nil
@@ -213,6 +212,52 @@ func getCurrentCircle() (Circle, error) {
 	}
 
 	return Circle{}, fmt.Errorf("no circle found for current time")
+}
+
+func getGameState(id string) (GameState, error) {
+	apiUrl := os.Getenv("POCKETBASE_URL")
+	req, err := http.NewRequest(http.MethodGet, apiUrl+"/api/collections/games/records/"+id, nil)
+	if err != nil {
+		return "", err
+	}
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var game Game
+	if err := json.NewDecoder(resp.Body).Decode(&game); err != nil {
+		return "", err
+	}
+
+	start, err := time.Parse(standardTimeFormat, game.Start)
+	if err != nil {
+		return "", err
+	}
+
+	end, err := time.Parse(standardTimeFormat, game.End)
+	if err != nil {
+		return "", err
+	}
+
+	currentTime := time.Now().UTC()
+
+	if currentTime.Before(start) {
+		return WAITING, nil
+	}
+
+	if currentTime.After(start) && currentTime.Before(end) {
+		return ACTIVE, nil
+	}
+
+	return FINISHED, nil
 }
 
 func authorizeRequest(req *http.Request, auth_token string) {
