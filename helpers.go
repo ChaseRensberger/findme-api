@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var AUTH_TOKEN string = os.Getenv("AUTH_TOKEN")
+
 func insertPlayerLocation(latitude float64, longitude float64) error {
 	payload := map[string]float64{
 		"latitude":  latitude,
@@ -158,6 +160,42 @@ func populateCircles(startTime time.Time, interval time.Duration, auth_token str
 		updateCircle(response.Items[circleIdx], auth_token)
 	}
 
+	setGameTime("qji7yh0msqphiq9", response.Items[0].Start, response.Items[len(response.Items)-1].End, auth_token)
+
+	return nil
+}
+
+func setGameTime(id string, start string, end string, auth_token string) error {
+	apiUrl := os.Getenv("POCKETBASE_URL")
+	payload := map[string]string{
+		"start": start,
+		"end":   end,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, apiUrl+"/api/collections/games/records/"+id, bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	authorizeRequest(req, auth_token)
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
 	return nil
 }
 
@@ -167,7 +205,7 @@ func getCurrentCircle() Circle {
 	if err != nil {
 		return Circle{}
 	}
-
+	authorizeRequest(req, AUTH_TOKEN)
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {

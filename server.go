@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -123,5 +124,6 @@ func getAuthToken(c echo.Context) (string, error) {
 	if auth_token == "" {
 		return "", fmt.Errorf("missing Authorization header")
 	}
+	auth_token = strings.TrimPrefix(auth_token, "Bearer ")
 	return auth_token, nil
 }
