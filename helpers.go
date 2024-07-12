@@ -161,29 +161,29 @@ func populateCircles(startTime time.Time, interval time.Duration, auth_token str
 	return nil
 }
 
-func getCurrentCircle() (Circle, error) {
+func getCurrentCircle() Circle {
 	apiUrl := os.Getenv("POCKETBASE_URL")
 	req, err := http.NewRequest(http.MethodGet, apiUrl+"/api/collections/circles/records", nil)
 	if err != nil {
-		return Circle{}, err
+		return Circle{}
 	}
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return Circle{}, err
+		return Circle{}
 	}
 
 	currentTime := time.Now().UTC()
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return Circle{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return Circle{}
 	}
 
 	var response CirclesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return Circle{}, err
+		return Circle{}
 	}
 
 	// Find the circle where start <= currentTime < end
@@ -192,26 +192,20 @@ func getCurrentCircle() (Circle, error) {
 		start, err := time.Parse(standardTimeFormat, circle.Start)
 		if err != nil {
 			fmt.Println(err)
-			return Circle{}, err
+			return Circle{}
 		}
 
 		end, err := time.Parse(standardTimeFormat, circle.End)
 		if err != nil {
-			return Circle{}, err
+			return Circle{}
 		}
 
-		fmt.Println("--------------------")
-		fmt.Println("start: ", start)
-		fmt.Println("end: ", end)
-		fmt.Println("currentTime: ", currentTime)
-		fmt.Println("--------------------")
-
 		if currentTime.After(start) && currentTime.Before(end) {
-			return circle, nil
+			return circle
 		}
 	}
 
-	return Circle{}, fmt.Errorf("no circle found for current time")
+	return Circle{}
 }
 
 func getGameState(id string) (GameState, error) {

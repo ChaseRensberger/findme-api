@@ -70,9 +70,9 @@ func main() {
 
 	// NO AUTH
 	e.GET("/current_circle", func(c echo.Context) error {
-		circle, err := getCurrentCircle()
-		if err != nil {
-			return err
+		circle := getCurrentCircle()
+		if circle.ID == "" {
+			return c.JSON(http.StatusNotFound, struct{}{})
 		}
 		return c.JSON(http.StatusOK, circle)
 	})
