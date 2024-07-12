@@ -5,7 +5,7 @@ var standardTimeFormat = "2006-01-02 15:04:05.000Z"
 type Circle struct {
 	Latitude       string  `json:"latitude"`
 	Longitude      string  `json:"longitude"`
-	Meters         int     `json:"meters_across"`
+	Meters         int     `json:"meters"`
 	CollectionID   string  `json:"collectionId"`
 	CollectionName string  `json:"collectionName"`
 	Created        string  `json:"created"`
