@@ -61,8 +61,11 @@ func main() {
 
 	// AUTH
 	e.GET("player_locations", func(c echo.Context) error {
-		token := c.QueryParam("token")
-		playerLocations, err := getAllPlayerLocations(token)
+		auth_token, err := getAuthToken(c)
+		if err != nil {
+			return err
+		}
+		playerLocations, err := getAllPlayerLocations(auth_token)
 		if err != nil {
 			return err
 		}
