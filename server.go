@@ -32,7 +32,7 @@ func main() {
 	})
 
 	// NO AUTH, RATE LIMITED
-	e.POST("/player_locations", func(c echo.Context) error {
+	e.POST("/player_location", func(c echo.Context) error {
 		var reqBody struct {
 			Latitude  string `json:"latitude"`
 			Longitude string `json:"longitude"`
