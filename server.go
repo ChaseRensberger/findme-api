@@ -116,7 +116,7 @@ func main() {
 	// 	return c.String(http.StatusOK, "Client IP: "+ip)
 	// })
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1324"))
 }
 
 func getAuthToken(c echo.Context) (string, error) {
